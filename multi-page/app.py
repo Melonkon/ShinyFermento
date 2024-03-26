@@ -2,12 +2,9 @@ from pathlib import Path
 
 import pandas as pd
 import psycopg2
-from modules import data_view_server, data_view_ui, training_server, training_ui
+from modules import test_view_ui, test_view_server
 
 from shiny import App, Inputs, Outputs, Session, reactive, ui
-
-df = pd.read_csv(Path(__file__).parent / "scores.csv")
-
 
 class DatabaseManager:
     def __init__(self, db_config):
@@ -33,19 +30,22 @@ class DatabaseManager:
         self.cursor.close()
         self.connection.close()
 
+db_config = {
+    "dbname": "test",
+    "user": "postgres",
+    "password": "4321or1234",
+    "host": "localhost",
+    "port": "5432"
+}
+
 app_ui = ui.page_navbar(
-    training_ui("tab1"),
-    data_view_ui("tab2"),
+    test_view_ui("tab1"),
     sidebar=ui.sidebar(
         ui.input_select(
-            "account",
-            "Account",
+            "tables",
+            "Tables",
             choices=[
-                "Berge & Berge",
-                "Fritsch & Fritsch",
-                "Hintz & Hintz",
-                "Mosciski and Sons",
-                "Wolff Ltd",
+                "bron"
             ],
         ),
         width="300px",
@@ -57,13 +57,37 @@ app_ui = ui.page_navbar(
 
 
 def server(input: Inputs, output: Outputs, session: Session):
+    db_manager = DatabaseManager(db_config)
 
-    @reactive.calc()
-    def filtered_data() -> pd.DataFrame:
-        return df.loc[df["account"] == input.account()]
+    @reactive.effect
+    def all_tables():
+        db_manager.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
+        result = db_manager.fetch_all()
+        tables = [table_name[0] for table_name in result]
+        ui.update_select("tables", choices=tables)
 
-    training_server(id="tab1", df=filtered_data)
-    data_view_server(id="tab2", df=filtered_data)
+    @reactive.calc
+    def df():  # Load directly from the database
+        selected_table = input.tables()
+        try:
+            db_manager.execute(f"SELECT * FROM {selected_table}")
+            result = db_manager.fetch_all()
+            columns = db_manager.cursor.description
+            return pd.DataFrame(result, columns=[column[0] for column in columns])
+        except Exception as e:
+            # Handle database errors here (display an error message, etc.)
+            print(f"Error loading data: {e}")
+            return pd.DataFrame()  # Return an empty DataFrame on error
+
+
+
+
+
+    test_view_server(id="tab1", df=df)
+    # training_server(id="tab2", df=filtered_data)
+    # data_view_server(id="tab3", df=filtered_data)
+
+
 
 
 app = App(app_ui, server)
