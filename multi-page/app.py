@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 import psycopg2
-from modules import test_view_ui, test_view_server
+from modules import test_view_ui, test_view_server, test2_view_ui, test2_view_server
 
 from shiny import App, Inputs, Outputs, Session, reactive, ui
 
@@ -31,15 +31,16 @@ class DatabaseManager:
         self.connection.close()
 
 db_config = {
-    "dbname": "test",
+    "dbname": "test2",
     "user": "postgres",
     "password": "4321or1234",
     "host": "localhost",
-    "port": "5432"
+    "port": "5433"
 }
 
 app_ui = ui.page_navbar(
     test_view_ui("tab1"),
+    test2_view_ui("tab2"),
     sidebar=ui.sidebar(
         ui.input_select(
             "tables",
@@ -79,11 +80,8 @@ def server(input: Inputs, output: Outputs, session: Session):
             print(f"Error loading data: {e}")
             return pd.DataFrame()  # Return an empty DataFrame on error
 
-
-
-
-
     test_view_server(id="tab1", df=df)
+    test2_view_server(id="tab2", df=df)
     # training_server(id="tab2", df=filtered_data)
     # data_view_server(id="tab3", df=filtered_data)
 
