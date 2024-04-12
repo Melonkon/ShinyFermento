@@ -181,7 +181,7 @@ def test_view_server(
             fig2.update_layout(
                 xaxis_title="Gemiddeld Percentage van Totaal Aantal Barcodes",
                 yaxis_title="Organisme",
-                title=f"Gemiddeld Percentage Voorkomen van Top 20 Organismen over experimenten: {' '.join(input.experiment_id_2.get())}",
+                title=f"Gemiddeld Percentage Voorkomen van Top 20 Organismen over experimenten: {', '.join(input.experiment_id_2.get())}",
                 xaxis=dict(
                     range=[0, 100]
                 )
@@ -204,10 +204,8 @@ def culturomics_view_ui():
                 ),
 
             ui.card(
-                ui.layout_columns(
                     ui.output_data_frame("culturomics_data"),
                     ui.output_data_frame("metagenomics_data")
-                )
         ),
         col_widths=(2, 10)
         ),
