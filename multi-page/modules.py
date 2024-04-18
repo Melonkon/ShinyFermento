@@ -27,41 +27,131 @@ def test_view_ui():
     return ui.nav_panel(
         "Metagenomics",
         ui.layout_columns(
-            ui.card(  # Add a new card
-                ui.card_header("Edit Data"),
-                    ui.input_select("x_axis", "X-axis", choices=[]),
-                    ui.input_select("y_axis", "Y-axis", choices=[]),
-                    ui.input_selectize("experiment_id_2", "Experiment ID", choices=[], multiple=True),
-                    ui.input_select("taxrank", "Tax Rank", choices=[]),
-                    ui.input_slider("count", "Count", min=1, max=1000, step=1, value=100),
-                    ui.input_slider("top_selector", "Select Top N organisms", min=1, max=30, step=1, value=10),
-                    ui.input_select("color", "Color", choices=[]),
-                ),
+            ui.navset_tab(
+                ui.nav_panel("Count Data",
+                             ui.layout_sidebar(
+                                 ui.sidebar(
+                                     ui.accordion(
+                                         ui.accordion_panel("Labeling",
+                                                            ui.input_text("plot_title_count", "Plot title",
+                                                                          value="Count Data"),
+                                                            ui.input_text("x_label_count", "X-axis label",
+                                                                          value="Organisms"),
+                                                            ui.input_text("y_label_count", "Y-axis label",
+                                                                          value="Count"),
+                                                            ui.input_action_button("update_labeling_count", "Update",
+                                                                                   class_="btn-success"),
+                                                            open=None
+                                                            )
+                                     ),
+                                     ui.input_select("x_axis_count", "X-axis", choices=['Loading...']),
+                                     ui.input_select("taxrank_count", "Taxrank", choices=['Loading...']),
+                                     ui.input_selectize("experiment_id_count", "Experiment ID", choices=['Loading...'],
+                                                        multiple=True, selected="Loading..."),
+                                     ui.input_slider("count_count", "Count", min=1, max=1000, step=1,
+                                                     value=100),
+                                     ui.input_slider("top_selector_count", "Select Top N organisms", min=1,
+                                                     max=30, step=1, value=10),
+                                     ui.input_select("color_count", "Color", choices=['Loading...']),
+                                     ui.input_radio_buttons("log_or_linear_count", "Log/Linear",
+                                                            {"log": "log", "linear": "linear"}),
+                                     ui.input_radio_buttons("mean_sum_count", "Mean/Sum",
+                                                            {"mean": "mean", "sum": "sum"}),
 
-            ui.card(
-        output_widget("plot"),
-        output_widget("test_plot"),
-        ),
-        col_widths=(2, 10)
-        ),
-        )
+                                 ),
+                                 output_widget("plot_count")),
 
+                             ),
+                ui.nav_panel("Percentage Data",
+                             ui.layout_sidebar(
+                                 ui.sidebar(
+                                     ui.accordion(
+                                         ui.accordion_panel("Labeling",
+                                                            ui.input_text("plot_title_percentage", "Plot title",
+                                                                          value="Percentage Data"),
+                                                            ui.input_text("x_label_percentage", "X-axis label",
+                                                                          value="Organisms"),
+                                                            ui.input_text("y_label_percenage", "Y-axis label",
+                                                                          value="Percentage"),
+                                                            ui.input_action_button("update_labeling_percentage",
+                                                                                   "Update",
+                                                                                   class_="btn-success"),
+                                                            open=None
+                                                            )
+                                     ),
+                                     ui.input_select("x_axis_percentage", "X-axis", choices=[]),
+                                     ui.input_select("taxrank_percentage", "Taxrank", choices=[]),
+                                     ui.input_selectize("experiment_id_percentage", "Experiment ID", choices=[],
+                                                        multiple=True),
+                                     ui.input_slider("count_percentage", "Count", min=1, max=1000, step=1, value=100),
+                                     ui.input_slider("top_selector_percentage", "Select Top N organisms", min=1, max=30,
+                                                     step=1, value=10),
+                                     ui.input_select("color_percentage", "Color", choices=[]),
+                                     ui.input_radio_buttons("log_or_linear_percentage", "Log/Linear",
+                                                            {"log": "log", "linear": "linear"}),
+                                     ui.input_radio_buttons("data_scope_percentage", "Data Scope",
+                                                            {"complete": "Complete", "top_n": "Top N"}),
+                                     ui.input_text("plot_title_percentage", "Plot title"),
+                                     ui.input_text("x_label_percentage", "X-axis label"),
+                                     ui.input_text("y_label_percentage", "Y-axis label"),
+                                 ),
+                                 output_widget("plot_percentage")
+                             ),
+
+                             ),
+                ui.nav_panel("Total Occurence",
+                             ui.layout_sidebar(
+                                 ui.sidebar(
+                                     ui.accordion(
+                                         ui.accordion_panel("Labeling",
+                                                            ui.input_text("plot_title_occurence", "Plot title",
+                                                                          value="Total Occurence"),
+                                                            ui.input_text("x_label_occurence", "X-axis label",
+                                                                          value="Percentage"),
+                                                            ui.input_text("y_label_occurence", "Y-axis label",
+                                                                          value="Organisms"),
+                                                            ui.input_action_button("update_labeling_occurence",
+                                                                                   "Update",
+                                                                                   class_="btn-success"),
+                                                            open=None
+                                                            )
+                                     ),
+                                     ui.input_select("taxrank_occurence", "Taxrank", choices=[]),
+                                     ui.input_selectize("experiment_id_occurence", "Experiment ID", choices=[],
+                                                        multiple=True),
+                                     ui.input_slider("count_occurence", "Count", min=1, max=1000, step=1,
+                                                     value=100),
+                                     ui.input_slider("top_selector_occurence", "Select Top N organisms", min=1,
+                                                     max=30, step=1, value=10),
+                                     ui.input_text("plot_title_occurence", "Plot title"),
+                                     ui.input_text("x_label_occurence", "X-axis label"),
+                                     ui.input_text("y_label_occurence", "Y-axis label"),
+                                 ),
+                                 output_widget("test_plot"),
+                                 ui.output_data_frame("metagenomics_tabel_occurence")
+                             ),
+                             ),
+            ),
+        ),
+    )
 
 
 @module.server
 def test_view_server(
-    input: Inputs, output: Outputs, session: Session, df: reactive.Value
+        input: Inputs, output: Outputs, session: Session, df: reactive.Value
 ):
-
+    print("test")
     @reactive.effect
     def x_axis():
+        print('test')
         if df.get().shape[0] != 0:
             choices = df.get().columns.tolist()
             if "scientific_name" in choices:
                 selection = "scientific_name"
             else:
                 selection = choices[0]
-            ui.update_select("x_axis", choices=choices, selected=selection)
+            ui.update_select("x_axis_count", choices=choices, selected=selection)
+            ui.update_select("x_axis_percentage", choices=choices, selected=selection)
 
     @reactive.effect
     def colors():
@@ -71,23 +161,27 @@ def test_view_server(
                 selection = "scientific_name"
             else:
                 selection = choices[0]
-            ui.update_select("color", choices=choices, selected=selection)
+            ui.update_select("color_count", choices=choices, selected=selection)
+            ui.update_select("color_percentage", choices=choices, selected=selection)
+            ui.update_select("color_occurence", choices=choices, selected=selection)
 
-    @reactive.effect
-    def y_axis():
-        if df.get().shape[0] != 0:
-            numeric_columns = df.get().select_dtypes(include=[np.number]).columns.tolist()
-            if "count" in numeric_columns:
-                selection = "count"
-            else:
-                selection = numeric_columns[0]
-            ui.update_select("y_axis", choices=numeric_columns, selected=selection)
+    # @reactive.effect
+    # def y_axis():
+    #     if df.get().shape[0] != 0:
+    #         numeric_columns = df.get().select_dtypes(include=[np.number]).columns.tolist()
+    #         if "count" in numeric_columns:
+    #             selection = "count"
+    #         else:
+    #             selection = numeric_columns[0]
+    #         ui.update_select("y_axis", choices=numeric_columns, selected=selection)
 
     @reactive.effect
     def experiment_id():
         if df.get().shape[0] != 0:
             choices = df.get()['experimentid'].unique().tolist()
-            ui.update_selectize("experiment_id_2", choices=choices, selected=choices[0])
+            ui.update_selectize("experiment_id_count", choices=choices, selected=choices[0])
+            ui.update_selectize("experiment_id_percentage", choices=choices, selected=choices[0])
+            ui.update_selectize("experiment_id_occurence", choices=choices, selected=choices[0])
 
     @reactive.effect
     def taxrank():
@@ -95,60 +189,144 @@ def test_view_server(
             choices = df.get()['taxrank'].unique().tolist()
             if "S" in choices:
                 selection = "S"
-            ui.update_select("taxrank", choices=choices, selected=selection)
+            ui.update_select("taxrank_count", choices=choices, selected=selection)
+            ui.update_select("taxrank_percentage", choices=choices, selected=selection)
+            ui.update_select("taxrank_occurence", choices=choices, selected=selection)
 
     # @reactive.calc
     # @reactive.event(input.x_axis, input.y_axis, input.experiment_id, input.taxrank, input.count)
     # def data_frame_maken():
 
+    @render_widget
+    @reactive.event(input.x_axis_count, input.experiment_id_count, input.taxrank_count, input.count_count,
+                    input.color_count, input.top_selector_count, input.log_or_linear_count, input.mean_sum_count,
+                    input.update_labeling_count)
+    def plot_count():
+        dataframe = df.get()
+        dataframe = dataframe[(dataframe['experimentid'].isin(input.experiment_id_count.get())) &
+                              (dataframe['taxrank'] == input.taxrank_count()) &
+                              (dataframe['count'] > input.count_count())]
+        aggregation_method = input.mean_sum_count()
+        df_total_counts = dataframe.groupby('scientific_name')['count'].agg(aggregation_method).reset_index()
+        df_top_organisms = df_total_counts.nlargest(input.top_selector_count(), columns='count')
+        fig = px.histogram(
+            data_frame=df_top_organisms,
+            x=input.x_axis_count(),
+            y='count',
+            color=input.color_count(),
+            color_discrete_sequence=px.colors.qualitative.Plotly
+        ).update_layout(
+            title=input.plot_title_count(),
+            yaxis_type=input.log_or_linear_count(),
+            xaxis_title=input.x_label_count(),
+            yaxis_title=input.y_label_count()
 
-
-
-
+        )
+        return fig
 
     @render_widget
-    @reactive.event(input.x_axis, input.y_axis, input.experiment_id_2, input.taxrank, input.count, input.color, input.top_selector)
+    @reactive.event(input.x_axis_percentage, input.experiment_id_percentage, input.taxrank_percentage,
+                    input.count_percentage, input.color_percentage, input.top_selector_percentage,
+                    input.log_or_linear_percentage, input.data_scope_percentage, input.update_labeling_percentage)
+    def plot_percentage():
+        dataframe = df.get()
+        dataframe = dataframe[(dataframe['experimentid'].isin(input.experiment_id_percentage.get())) &
+                              (dataframe['taxrank'] == input.taxrank_percentage()) &
+                              (dataframe['count'] > input.count_percentage())]
+        if input.data_scope_percentage() == 'complete':
+            total_counts = dataframe['count'].sum()
+            df_total_counts = dataframe.groupby('scientific_name')['count'].sum().reset_index()
+            df_total_counts['percentage'] = (df_total_counts['count'] / total_counts) * 100
+        elif input.data_scope_percentage() == 'top_n':
+            df_total_counts = dataframe.groupby('scientific_name')['count'].sum().reset_index()
+            df_top_organisms = df_total_counts.nlargest(input.top_selector_percentage(), columns='count')
+            top_total_counts = df_top_organisms['count'].sum()
+            df_top_organisms['percentage'] = (df_top_organisms['count'] / top_total_counts) * 100
+            df_total_counts = df_top_organisms
+        df_top_organisms = df_total_counts.nlargest(input.top_selector_percentage(), columns='percentage')
+        fig = px.histogram(
+            data_frame=df_top_organisms,
+            x=input.x_axis_percentage(),
+            y='percentage',
+            color=input.color_percentage(),
+            color_discrete_sequence=px.colors.qualitative.Plotly
+        ).update_layout(
+            title=input.plot_title_percentage(),
+            yaxis_type=input.log_or_linear_percentage(),
+            xaxis_title=input.x_label_percentage(),
+            yaxis_title=input.y_label_percentage()
+        )
+
+        return fig
+
+    @render_widget
+    @reactive.event(input.x_axis, input.y_axis, input.experiment_id_2, input.taxrank, input.count, input.color,
+                    input.top_selector, input.log_or_linear, input.mean_sum, input.data_scope,
+                    input.update_labeling_occurence)
     def plot():
         print(input.top_selector())
         if input.x_axis() != None and input.y_axis() != None:
             dataframe = df.get()
-            dataframe = dataframe[(dataframe['experimentid'] == input.experiment_id_2.get()[0]) & (dataframe['taxrank'] == input.taxrank()) & (dataframe['count'] > input.count())]
+            dataframe = dataframe[(dataframe['experimentid'].isin(input.experiment_id_2.get())) &
+                                  (dataframe['taxrank'] == input.taxrank()) &
+                                  (dataframe['count'] > input.count())]
+
             if input.y_axis() == 'count':
-                # Calculate total count per organism
-                df_total_counts = dataframe.groupby('scientific_name')['count'].sum().reset_index()
+                aggregation_method = input.mean_sum()
+                df_total_counts = dataframe.groupby('scientific_name')['count'].agg(aggregation_method).reset_index()
+            elif input.y_axis() == 'percentage':
+                ui.update_radio_buttons("log_or_linear", selected="linear")
+                # Aggregate total counts for each organism across the selected samples
+                if input.data_scope() == 'complete':
+                    total_counts = dataframe['count'].sum()
+                    df_total_counts = dataframe.groupby('scientific_name')['count'].sum().reset_index()
+                    df_total_counts['percentage'] = (df_total_counts['count'] / total_counts) * 100
+                elif input.data_scope() == 'top_n':
+                    df_total_counts = dataframe.groupby('scientific_name')['count'].sum().reset_index()
+                    df_top_organisms = df_total_counts.nlargest(input.top_selector(), columns='count')
+                    top_total_counts = df_top_organisms['count'].sum()
+                    df_top_organisms['percentage'] = (df_top_organisms['count'] / top_total_counts) * 100
+                    df_total_counts = df_top_organisms
 
-                # Select top n organisms by total count
-                df_top_organisms = df_total_counts.nlargest(input.top_selector(), columns='count')
-
-                # Filter the original dataframe based on the selected organisms
+            # Filter the original dataframe based on the selected organisms if necessary
+            if input.data_scope() == 'complete':
+                df_top_organisms = df_total_counts.nlargest(input.top_selector(), columns=input.y_axis())
                 dataframe = dataframe[dataframe['scientific_name'].isin(df_top_organisms['scientific_name'])]
+            else:
+                # already filtered to top N in the percentage case
+                if input.y_axis() != 'percentage':
+                    df_top_organisms = df_total_counts.nlargest(input.top_selector(), columns=input.y_axis())
 
             x_axis_selection = input.x_axis()
             y_axis_selection = input.y_axis()
             fig = (px.histogram(
-                data_frame=dataframe,
+                data_frame=df_top_organisms,
                 x=x_axis_selection,
                 y=y_axis_selection,
                 color=input.color(),
                 color_discrete_sequence=px.colors.qualitative.Plotly,
+            ).update_layout(
+                title=input.plot_title_occurence(),
+                yaxis_type=input.log_or_linear_occurence(),
+                xaxis_title=input.x_label_occurence(),
+                yaxis_title=input.y_label_occurence()
             )
-            .update_layout(
-                title="Test Plot",
-                yaxis_type='log'
             ).update_xaxes(tickangle=45)
-            ).update_yaxes(showgrid=True, minor_showgrid=False)
+
             return fig
+
     @render_widget
-    @reactive.event(input.x_axis, input.y_axis, input.experiment_id_2, input.taxrank, input.count, input.top_selector)
+    @reactive.event(input.experiment_id_occurence, input.taxrank_occurence, input.count_occurence,
+                    input.top_selector_occurence)
     def test_plot():
-        if input.x_axis() != None and input.y_axis() != None and len(input.experiment_id_2()) > 0 and df.get().shape[0] != 0:
+        if len(input.experiment_id_occurence()) > 0 and df.get().shape[0] != 0:
             dataframe = df.get()
             dataframe['unique_barcode'] = dataframe['experimentid'].astype(str) + '_' + dataframe['barcode'].astype(str)
 
             # Filter for multiple experiment IDs
-            filtered_df = dataframe[(dataframe['count'] > input.count()) &
-                                    (dataframe['experimentid'].isin(input.experiment_id_2.get())) &
-                                    (dataframe['taxrank'] == input.taxrank())]
+            filtered_df = dataframe[(dataframe['count'] > input.count_occurence()) &
+                                    (dataframe['experimentid'].isin(input.experiment_id_occurence.get())) &
+                                    (dataframe['taxrank'] == input.taxrank_occurence())]
             # Berekenen van het totale aantal barcodes per experiment
             # total_barcodes_per_experiment = dataframe.groupby('experimentid')['unique_barcode'].nunique()
             total_barcodes = filtered_df['unique_barcode'].nunique()
@@ -161,11 +339,11 @@ def test_view_server(
                 lambda row: (row['barcode_count'] / total_barcodes) * 100, axis=1)
 
             top_10_occurrence_per_experiment = organism_occurrence_per_experiment.groupby('scientific_name').apply(
-                lambda x: x.nlargest(input.top_selector(), 'percentage')).reset_index(drop=True)
+                lambda x: x.nlargest(input.top_selector_occurence(), 'percentage')).reset_index(drop=True)
 
             # Gecombineerde plot maken voor alle experimenten met het gemiddelde percentage
             combined_df = top_10_occurrence_per_experiment.groupby('scientific_name')['percentage'].mean().reset_index()
-            top_10_combined = combined_df.nlargest(input.top_selector(), 'percentage')
+            top_10_combined = combined_df.nlargest(input.top_selector_occurence(), 'percentage')
 
             fig2 = px.bar(
                 top_10_combined,
@@ -181,7 +359,7 @@ def test_view_server(
             fig2.update_layout(
                 xaxis_title="Gemiddeld Percentage van Totaal Aantal Barcodes",
                 yaxis_title="Organisme",
-                title=f"Gemiddeld Percentage Voorkomen van Top 20 Organismen over experimenten: {', '.join(input.experiment_id_2.get())}",
+                title=f"Gemiddeld Percentage Voorkomen van Top 20 Organismen over experimenten: {', '.join(input.experiment_id_occurence.get())}",
                 xaxis=dict(
                     range=[0, 100]
                 )
@@ -189,35 +367,60 @@ def test_view_server(
 
             return fig2
 
+    @render.data_frame
+    def metagenomics_tabel():
+        dataframe = df.get()
+        if input.x_axis() != None and input.y_axis() != None:
+            dataframe = dataframe[(dataframe['experimentid'] == input.experiment_id_2.get()[0]) & (
+                        dataframe['taxrank'] == input.taxrank()) & (dataframe['count'] > input.count())]
+            if input.y_axis() in ['count', 'percentage']:
+                df_total_counts = dataframe.groupby('scientific_name')['count'].sum().reset_index()
+
+                df_top_organisms = df_total_counts.nlargest(input.top_selector(), columns='count')
+
+                dataframe = dataframe[dataframe['scientific_name'].isin(df_top_organisms['scientific_name'])]
+                print(dataframe['percentage'].mean())
+            return render.DataGrid(dataframe, row_selection_mode="single", filters=True, summary=True)
+
+    @render.data_frame
+    @reactive.event(input.count, input.experiment_id_2, input.taxrank, input.y_axis, input.top_selector)
+    def metagenomics_tabel_occurence():
+        dataframe = df.get()
+        dataframe = dataframe[(dataframe['count'] > input.count()) &
+                              (dataframe['experimentid'].isin(input.experiment_id_2.get())) &
+                              (dataframe['taxrank'] == input.taxrank())]
+        return render.DataGrid(dataframe, row_selection_mode="multiple", filters=True, summary=True)
+
+    # @reactive.effect
+    # @reactive.event(input.metagenomics_tabel_selected_rows)
+    # def select_all():
+    #     input.metagenomics_tabel_occurence_selected_rows.set(1)
+
+
 @module.ui
 def culturomics_view_ui():
     return ui.nav_panel(
         "Culturomics",
-        ui.layout_columns(
-            ui.card(  # Add a new card
+        ui.layout_sidebar(
+            ui.sidebar(
                 ui.card_header("Edit Data"),
-                    ui.input_select("culturomics_x_axis", "X-axis", choices=[]),
-                    ui.input_select("culturomics_y_axis", "Y-axis", choices=[]),
-                    ui.input_slider("culturomics_count", "Count", min=1, max=1000, step=1, value=100),
-                    ui.input_slider("culturomics_top_selector", "Select Top N organisms", min=1, max=30, step=1, value=10),
-                    ui.input_select("culturomics_color", "Color", choices=[]),
-                ),
-
-            ui.card(
-                    ui.output_data_frame("culturomics_data"),
-                    ui.output_data_frame("metagenomics_data")
+                ui.input_select("culturomics_x_axis", "X-axis", choices=[]),
+                ui.input_select("culturomics_y_axis", "Y-axis", choices=[]),
+                ui.input_slider("culturomics_count", "Count", min=1, max=1000, step=1, value=100),
+                ui.input_slider("culturomics_top_selector", "Select Top N organisms", min=1, max=30, step=1, value=10),
+                ui.input_select("culturomics_color", "Color", choices=[]),
+            ),
+            ui.output_data_frame("culturomics_data"),
+            ui.output_data_frame("metagenomics_data")
         ),
-        col_widths=(2, 10)
-        ),
-        )
-
+    )
 
 
 @module.server
 def culturomics_view_server(
-    input: Inputs, output: Outputs, session: Session, df_culturomics: reactive.Value, df_metagenomics: reactive.Value
+        input: Inputs, output: Outputs, session: Session, df_culturomics: reactive.Value,
+        df_metagenomics: reactive.Value
 ):
-
     @render.data_frame
     def culturomics_data():
         dataframe = df_culturomics.get()
@@ -231,7 +434,9 @@ def culturomics_view_server(
             culturomics_dataframe = df_culturomics.get()
             selected_row = input.culturomics_data_selected_rows()
             selected_organism = " ".join(culturomics_dataframe.loc[selected_row[0]]['wgs_organisme'].split(' ')[0:2])
-            metagenomics_dataframe = metagenomics_dataframe[(metagenomics_dataframe['scientific_name'] == selected_organism) & (metagenomics_dataframe['count'] > input.culturomics_count())]
+            metagenomics_dataframe = metagenomics_dataframe[
+                (metagenomics_dataframe['scientific_name'] == selected_organism) & (
+                            metagenomics_dataframe['count'] > input.culturomics_count())]
 
             return render.DataGrid(metagenomics_dataframe)
 
@@ -265,19 +470,15 @@ def culturomics_view_server(
                 selection = numeric_columns[0]
             ui.update_select("culturomics_y_axis", choices=numeric_columns, selected=selection)
 
-
-
-
-
-
-
     @render_widget
-    @reactive.event(input.x_axis, input.y_axis, input.experiment_id_2, input.taxrank, input.count, input.color, input.top_selector)
+    @reactive.event(input.x_axis, input.y_axis, input.experiment_id_2, input.taxrank, input.count, input.color,
+                    input.top_selector)
     def plot():
         print(input.top_selector())
         if input.x_axis() != None and input.y_axis() != None:
             dataframe = df.get()
-            dataframe = dataframe[(dataframe['experimentid'] == input.experiment_id_2.get()[0]) & (dataframe['taxrank'] == input.taxrank()) & (dataframe['count'] > input.count())]
+            dataframe = dataframe[(dataframe['experimentid'] == input.experiment_id_2.get()[0]) & (
+                        dataframe['taxrank'] == input.taxrank()) & (dataframe['count'] > input.count())]
             # dataframe = dataframe.nlargest(input.top_selector(), columns='count').reset_index(drop=True)
             x_axis_selection = input.x_axis()
             y_axis_selection = input.y_axis()
@@ -287,15 +488,17 @@ def culturomics_view_server(
                 y=y_axis_selection,
                 color=input.color(),
             )
-            .update_layout(
+                   .update_layout(
                 title="Test Plot",
                 yaxis_type='log'
             ).update_xaxes(tickangle=45))
             return fig
+
     @render_widget
     @reactive.event(input.x_axis, input.y_axis, input.experiment_id_2, input.taxrank, input.count)
     def test_plot():
-        if input.x_axis() != None and input.y_axis() != None and len(input.experiment_id_2()) > 0 and df.get().shape[0] != 0:
+        if input.x_axis() != None and input.y_axis() != None and len(input.experiment_id_2()) > 0 and df.get().shape[
+            0] != 0:
             dataframe = df.get()
             dataframe['unique_barcode'] = dataframe['experimentid'].astype(str) + '_' + dataframe['barcode'].astype(str)
 
@@ -344,7 +547,6 @@ def culturomics_view_server(
             return fig2
 
 
-
 @module.ui
 def test2_view_ui():
     return ui.nav_panel(
@@ -375,11 +577,13 @@ def test2_view_ui():
 
     )
 
+
 @module.server
 def test2_view_server(
-    input: Inputs, output: Outputs, session: Session, df: reactive.Value
+        input: Inputs, output: Outputs, session: Session, df: reactive.Value
 ):
     flag = reactive.value(0)
+
     @render.text
     def row_count():
         return df.get().shape[0]
@@ -408,7 +612,6 @@ def test2_view_server(
         #
         # return df.get()  # Return the modified DataFrame
 
-
     @render.data_frame
     def data():
         dataframe = df.get()
@@ -425,47 +628,47 @@ def test2_view_server(
         choices = df.get().columns.tolist()
         ui.update_select("column", choices=choices)
 
+
 @module.ui
 def dotplot_view_ui():
     return ui.nav_panel(
         "Dotplot",
         ui.layout_columns(
-            ui.card(  # Add a new card
-            ui.card_header("Sample selection"),
-            ui.output_text_verbatim("first_selected_organism"),
-            ui.output_text_verbatim("second_selected_organism"),
-            ui.layout_columns(
-                ui.input_action_button("send", "Maak dotplot", class_="btn-success", width="200px", height="40px",),
-            ),
-            ui.layout_columns(
-                ui.input_select("jobs", "Select job", choices=['None']),
-                ui.input_action_button("goJob", "Go to job", class_="btn-success", width="200px", height="40px", style="margin-top: 20px;"),
-            )
-        ),
-            ui.layout_columns(
-                ui.card(
-                    ui.card_header("Sample table"),
-                    ui.output_data_frame("data"),
+            ui.layout_sidebar(
+                ui.sidebar(
+                    ui.output_text_verbatim("first_selected_organism"),
+                    ui.output_text_verbatim("second_selected_organism"),
                     ui.layout_columns(
-                        ui.div(
-                            ui.input_action_button("select", "Select", class_="btn-success", width="200px",
-                                                   height="40px"),
-                            ui.input_action_button("reset", "Reset", class_="btn-danger", width="200px", height="40px"),
-                            style="display: flex; justify-content: center; gap: 20px;"
-                        ),
+                        ui.input_action_button("send", "Maak dotplot", class_="btn-success", width="200px",
+                                               height="40px", ),
+                    ),
+                    ui.layout_columns(
+                        ui.input_select("jobs", "Select job", choices=['None']),
+                    ),
+                    ui.input_action_button("goJob", "Go to job", class_="btn-success", width="200px", height="40px",
+                                           style="margin-top: 20px;"),
+                ),
+                ui.layout_columns(
+                    ui.output_data_frame("data"),
+                    style="margin-top: 20px;",
+                ),
+                ui.layout_columns(
+                    ui.div(
+                        ui.input_action_button("select", "Select", class_="btn-success", width="200px",
+                                               height="40px"),
+                        ui.input_action_button("reset", "Reset", class_="btn-danger", width="200px", height="40px"),
+                        style="display: flex; justify-content: center; gap: 20px;"
                     ),
                 ),
-                style="margin-top: 20px;",
-            ),
 
-        col_widths=(3, 9)
-
+            )
         )
     )
 
+
 @module.server
 def dotplot_view_server(
-    input: Inputs, output: Outputs, session: Session, df: reactive.Value
+        input: Inputs, output: Outputs, session: Session, df: reactive.Value
 ):
     selected_genus_name = reactive.value(None)
     selection_df = reactive.value(pd.DataFrame())
@@ -525,7 +728,7 @@ def dotplot_view_server(
         first_sample_name.set(None)
         second_sample_name.set(None)
         selected_genus_name.set(None)
-    
+
     @reactive.effect
     @reactive.event(input.send)
     def request_dgenies():
@@ -624,7 +827,6 @@ def dotplot_view_server(
                     }
                     response = session.post(url, files=files)
 
-
             print(response.status_code, response.text)
 
             os.remove(file_path_1)
@@ -721,7 +923,7 @@ def dotplot_view_server(
     @reactive.effect
     def update_job_list():
         if active_jobs.get() != []:
-             ui.update_select("jobs", choices=active_jobs.get())
+            ui.update_select("jobs", choices=active_jobs.get())
 
     @reactive.effect
     @reactive.event(input.goJob)

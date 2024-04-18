@@ -47,8 +47,8 @@ db_config = {
 }
 
 app_ui = ui.page_navbar(
-    culturomics_view_ui("tab4"),
     test_view_ui("tab2"),
+    culturomics_view_ui("tab4"),
     dotplot_view_ui("tab1"),
     test2_view_ui("tab3"),
     header=ui.include_css(Path(__file__).parent / "styles.css"),
@@ -58,9 +58,8 @@ app_ui = ui.page_navbar(
 
 
 def server(input: Inputs, output: Outputs, session: Session):
-
     db_manager = DatabaseManager(db_config)
-
+    print("Connected to the database")
     dataframe = reactive.value(pd.DataFrame())
     dataframe_meegeven = reactive.value(pd.DataFrame())
     dataframe_culturomics = reactive.value(pd.DataFrame())
