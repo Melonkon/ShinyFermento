@@ -39,7 +39,7 @@ class DatabaseManager:
 # }
 
 db_config = {
-    "dbname": "test2",
+    "dbname": "test5",
     "user": "ridderplaat.q",
     "password": "Quinten4321or1234!",
     "host": "145.97.18.149",
@@ -140,7 +140,7 @@ def server(input: Inputs, output: Outputs, session: Session):
     culturomics_view_server(id="tab4", df_culturomics=dataframe_culturomics, df_metagenomics=dataframe_metagenomics)
     dotplot_view_server(id="tab1", df=dataframe_culturomics)
     test_view_server(id="tab2", df=dataframe_metagenomics)
-    test2_view_server(id="tab3", df=dataframe_culturomics)
+    test2_view_server(id="tab3", db_manager=db_manager)
 
     # training_server(id="tab2", df=filtered_data)
     # data_view_server(id="tab3", df=filtered_data)

@@ -33,104 +33,121 @@ def test_view_ui():
                                  ui.sidebar(
                                      ui.accordion(
                                          ui.accordion_panel("Labeling",
+                                                            ui.input_radio_buttons("log_or_linear_count", "Linear/Log",
+                                                                                   { "linear": "linear", "log": "log",}),
                                                             ui.input_text("plot_title_count", "Plot title",
                                                                           value="Count Data"),
                                                             ui.input_text("x_label_count", "X-axis label",
                                                                           value="Organisms"),
                                                             ui.input_text("y_label_count", "Y-axis label",
                                                                           value="Count"),
+                                                            ui.input_slider("figure_width_count", "Figure Witdh", min=300,
+                                                                            max=2000, step=50, value=1000),
+                                                            ui.input_slider("figure_height_count", "Figure Height", min=300,
+                                                                            max=2000, step=50, value=700),
                                                             ui.input_action_button("update_labeling_count", "Update",
                                                                                    class_="btn-success"),
+
                                                             open=None
                                                             )
                                      ),
+                                     ui.input_switch("log_transform_count", "Log Transformation", value=False),
                                      ui.input_select("x_axis_count", "X-axis", choices=['Loading...']),
                                      ui.input_select("taxrank_count", "Taxrank", choices=['Loading...']),
                                      ui.input_selectize("experiment_id_count", "Experiment ID", choices=['Loading...'],
                                                         multiple=True, selected="Loading..."),
+                                     ui.input_radio_buttons("combined_or_separate_count", "Combined/Separate",
+                                                            {"combined": "combined", "separate": "separate"}),
                                      ui.input_slider("count_count", "Count", min=1, max=1000, step=1,
                                                      value=100),
                                      ui.input_slider("top_selector_count", "Select Top N organisms", min=1,
                                                      max=30, step=1, value=10),
                                      ui.input_select("color_count", "Color", choices=['Loading...']),
-                                     ui.input_radio_buttons("log_or_linear_count", "Log/Linear",
-                                                            {"log": "log", "linear": "linear"}),
+
                                      ui.input_radio_buttons("mean_sum_count", "Mean/Sum",
                                                             {"mean": "mean", "sum": "sum"}),
 
                                  ),
-                                 output_widget("plot_count")),
+                                 output_widget("plot_count"),
+                                 ui.output_data_frame("table_count"))
 
-                             ),
-                ui.nav_panel("Percentage Data",
-                             ui.layout_sidebar(
-                                 ui.sidebar(
-                                     ui.accordion(
-                                         ui.accordion_panel("Labeling",
-                                                            ui.input_text("plot_title_percentage", "Plot title",
-                                                                          value="Percentage Data"),
-                                                            ui.input_text("x_label_percentage", "X-axis label",
-                                                                          value="Organisms"),
-                                                            ui.input_text("y_label_percenage", "Y-axis label",
-                                                                          value="Percentage"),
-                                                            ui.input_action_button("update_labeling_percentage",
-                                                                                   "Update",
-                                                                                   class_="btn-success"),
-                                                            open=None
-                                                            )
-                                     ),
-                                     ui.input_select("x_axis_percentage", "X-axis", choices=[]),
-                                     ui.input_select("taxrank_percentage", "Taxrank", choices=[]),
-                                     ui.input_selectize("experiment_id_percentage", "Experiment ID", choices=[],
-                                                        multiple=True),
-                                     ui.input_slider("count_percentage", "Count", min=1, max=1000, step=1, value=100),
-                                     ui.input_slider("top_selector_percentage", "Select Top N organisms", min=1, max=30,
-                                                     step=1, value=10),
-                                     ui.input_select("color_percentage", "Color", choices=[]),
-                                     ui.input_radio_buttons("log_or_linear_percentage", "Log/Linear",
-                                                            {"log": "log", "linear": "linear"}),
-                                     ui.input_radio_buttons("data_scope_percentage", "Data Scope",
-                                                            {"complete": "Complete", "top_n": "Top N"}),
-                                     ui.input_text("plot_title_percentage", "Plot title"),
-                                     ui.input_text("x_label_percentage", "X-axis label"),
-                                     ui.input_text("y_label_percentage", "Y-axis label"),
-                                 ),
-                                 output_widget("plot_percentage")
-                             ),
+                    ),
+                    ui.nav_panel("Percentage Data",
+                                 ui.layout_sidebar(
+                                        ui.sidebar(
+                                            ui.accordion(
+                                                ui.accordion_panel("Labeling",
+                                                                   ui.input_radio_buttons("log_or_linear_percentage",
+                                                                                          "Linear/Log", { "linear": "linear", "log": "log",}),
+                                                                   ui.input_text("plot_title_percentage", "Plot title",
+                                                                                 value="Percentage Data"),
+                                                                   ui.input_text("x_label_percentage", "X-axis label",
+                                                                                 value="Organisms"),
+                                                                   ui.input_text("y_label_percentage", "Y-axis label",
+                                                                                 value="Percentage"),
+                                                                   ui.input_slider("figure_width_percentage", "Figure Witdh",
+                                                                                   min=300,
+                                                                                   max=2000, step=50, value=1000),
+                                                                   ui.input_slider("figure_height_percentage",
+                                                                                   "Figure Height", min=300,
+                                                                                   max=2000, step=50, value=700),
+                                                                   ui.input_action_button("update_labeling_percentage",
+                                                                                          "Update",
+                                                                                          class_="btn-success"),
+                                                                   open=None
+                                                                   )
+                                            ),
+                                        ui.input_switch("log_trans_percentage", "Log Transformation", value=False),
+                                         ui.input_select("x_axis_percentage", "X-axis", choices=[]),
+                                         ui.input_select("taxrank_percentage", "Taxrank", choices=[]),
+                                         ui.input_selectize("experiment_id_percentage", "Experiment ID", choices=[], multiple=True),
 
-                             ),
-                ui.nav_panel("Total Occurence",
-                             ui.layout_sidebar(
-                                 ui.sidebar(
-                                     ui.accordion(
-                                         ui.accordion_panel("Labeling",
-                                                            ui.input_text("plot_title_occurence", "Plot title",
-                                                                          value="Total Occurence"),
-                                                            ui.input_text("x_label_occurence", "X-axis label",
-                                                                          value="Percentage"),
-                                                            ui.input_text("y_label_occurence", "Y-axis label",
-                                                                          value="Organisms"),
-                                                            ui.input_action_button("update_labeling_occurence",
-                                                                                   "Update",
-                                                                                   class_="btn-success"),
-                                                            open=None
-                                                            )
+                                         ui.input_slider("count_percentage", "Count", min=1, max=1000, step=1, value=100),
+                                         ui.input_slider("top_selector_percentage", "Select Top N organisms", min=1, max=30, step=1, value=10),
+                                         ui.input_select("color_percentage", "Color", choices=[]),
+
+                                         ui.input_radio_buttons("data_scope_percentage", "Data Scope", {"complete": "Complete", "top_n": "Top N"})
                                      ),
-                                     ui.input_select("taxrank_occurence", "Taxrank", choices=[]),
-                                     ui.input_selectize("experiment_id_occurence", "Experiment ID", choices=[],
-                                                        multiple=True),
-                                     ui.input_slider("count_occurence", "Count", min=1, max=1000, step=1,
-                                                     value=100),
-                                     ui.input_slider("top_selector_occurence", "Select Top N organisms", min=1,
-                                                     max=30, step=1, value=10),
-                                     ui.input_text("plot_title_occurence", "Plot title"),
-                                     ui.input_text("x_label_occurence", "X-axis label"),
-                                     ui.input_text("y_label_occurence", "Y-axis label"),
+                                         output_widget("plot_percentage"),
+                                            ui.output_data_frame("table_percentage")
                                  ),
+
+                    ),
+                    ui.nav_panel("Total Occurence",
+                                 ui.layout_sidebar(
+                                     ui.sidebar(
+                                         ui.accordion(
+                                             ui.accordion_panel("Labeling",
+                                                                ui.input_text("plot_title_occurence", "Plot title",
+                                                                              value="Gemiddeld Percentage van Totaal Aantal Barcodes"),
+                                                                ui.input_text("x_label_occurence", "X-axis label",
+                                                                              value="Percentage"),
+                                                                ui.input_text("y_label_occurence", "Y-axis label",
+                                                                              value="Organisms"),
+                                                                ui.input_slider("figure_width_occurence", "Figure Witdh",
+                                                                                min=300,
+                                                                                max=2000, step=50, value=1000),
+                                                                ui.input_slider("figure_height_occurence", "Figure Height",
+                                                                                min=300,
+                                                                                max=2000, step=50, value=700),
+                                                                ui.input_action_button("update_labeling_occurence",
+                                                                                       "Update",
+                                                                                       class_="btn-success"),
+                                                                open=None
+                                                                )
+                                         ),
+                                         ui.input_select("taxrank_occurence", "Taxrank", choices=[]),
+                                         ui.input_selectize("experiment_id_occurence", "Experiment ID", choices=[],
+                                                            multiple=True),
+                                         ui.input_slider("count_occurence", "Count", min=1, max=1000, step=1,
+                                                         value=100),
+                                         ui.input_slider("top_selector_occurence", "Select Top N organisms", min=1,
+                                                         max=30, step=1, value=10),
+                                     ),
                                  output_widget("test_plot"),
-                                 ui.output_data_frame("metagenomics_tabel_occurence")
-                             ),
-                             ),
+                                 ui.output_data_frame("table_occurence")
+                                 ),
+                ),
             ),
         ),
     )
@@ -140,7 +157,18 @@ def test_view_ui():
 def test_view_server(
         input: Inputs, output: Outputs, session: Session, df: reactive.Value
 ):
+
+    table_dataframe_count = reactive.value(pd.DataFrame())
+    table_dataframe_percentage = reactive.value(pd.DataFrame())
+    table_dataframe_occurence = reactive.value(pd.DataFrame())
     print("test")
+
+    def save_table_to_csv(dataframe, filename):
+        """
+        Save a pandas DataFrame to a CSV file.
+        """
+        dataframe.to_csv(filename, index=False)
+
     @reactive.effect
     def x_axis():
         print('test')
@@ -200,69 +228,156 @@ def test_view_server(
     @render_widget
     @reactive.event(input.x_axis_count, input.experiment_id_count, input.taxrank_count, input.count_count,
                     input.color_count, input.top_selector_count, input.log_or_linear_count, input.mean_sum_count,
-                    input.update_labeling_count)
+                    input.update_labeling_count, input.figure_width_count, input.figure_height_count,
+                    input.combined_or_separate_count,
+                    input.log_transform_count)
     def plot_count():
         dataframe = df.get()
-        dataframe = dataframe[(dataframe['experimentid'].isin(input.experiment_id_count.get())) &
-                              (dataframe['taxrank'] == input.taxrank_count()) &
-                              (dataframe['count'] > input.count_count())]
-        aggregation_method = input.mean_sum_count()
-        df_total_counts = dataframe.groupby('scientific_name')['count'].agg(aggregation_method).reset_index()
-        df_top_organisms = df_total_counts.nlargest(input.top_selector_count(), columns='count')
-        fig = px.histogram(
-            data_frame=df_top_organisms,
-            x=input.x_axis_count(),
-            y='count',
-            color=input.color_count(),
-            color_discrete_sequence=px.colors.qualitative.Plotly
-        ).update_layout(
-            title=input.plot_title_count(),
-            yaxis_type=input.log_or_linear_count(),
-            xaxis_title=input.x_label_count(),
-            yaxis_title=input.y_label_count()
+        if dataframe.shape[0] != 0 and input.x_axis_count() != "Loading...":
+            print(input.combined_or_separate_count())
+            if input.combined_or_separate_count() == 'separate':
+                print("test")
+                filtered_dataframe = dataframe[
+                    (dataframe['experimentid'].isin(input.experiment_id_count.get())) &
+                    (dataframe['taxrank'] == input.taxrank_count()) &
+                    (dataframe['count'] > input.count_count())
+                    ].assign(
+                    experiment_organism=lambda x: x['experimentid'].astype(str) + " - " + x['scientific_name']
+                )
 
-        )
-        return fig
+                aggregation_method = input.mean_sum_count()
+
+                # Conditionally apply log transformation
+                if input.log_transform_count():
+                    filtered_dataframe['count'] = np.log1p(filtered_dataframe['count'])
+
+                filtered_dataframe['aggregated_count'] = filtered_dataframe.groupby('experiment_organism')[
+                    'count'].transform(aggregation_method)
+
+                df_top_organisms = filtered_dataframe.sort_values(by='aggregated_count',
+                                                                  ascending=False).drop_duplicates(
+                    subset='experiment_organism').head(input.top_selector_count())
+                print(df_top_organisms)
+                fig = px.histogram(
+                    data_frame=df_top_organisms,
+                    x='experiment_organism',
+                    y='aggregated_count',
+                    color=input.color_count(),
+                    color_discrete_sequence=px.colors.qualitative.Plotly,
+                    width=input.figure_width_count(),
+                    height=input.figure_height_count()
+                ).update_layout(
+                    title=input.plot_title_count(),
+                    yaxis_type=input.log_or_linear_count(),
+                    xaxis_title=input.x_label_count(),
+                    yaxis_title=input.y_label_count(),
+                )
+            elif input.combined_or_separate_count() == 'combined':
+                print("combined")
+                dataframe = dataframe[(dataframe['experimentid'].isin(input.experiment_id_count.get())) &
+                                      (dataframe['taxrank'] == input.taxrank_count()) &
+                                      (dataframe['count'] > input.count_count())]
+
+                aggregation_method = input.mean_sum_count()
+
+                # Conditionally apply log transformation
+                if input.log_transform_count():
+                    dataframe['count'] = np.log1p(dataframe['count'])
+
+                df_total_counts = dataframe.groupby('scientific_name')['count'].agg(aggregation_method).reset_index()
+                df_top_organisms = df_total_counts.nlargest(input.top_selector_count(), columns='count')
+                fig = px.histogram(
+                    data_frame=df_top_organisms,
+                    x=input.x_axis_count(),
+                    y='count',
+                    color=input.color_count(),
+                    color_discrete_sequence=px.colors.qualitative.Plotly,
+                    width=input.figure_width_count(),
+                    height=input.figure_height_count()
+                ).update_layout(
+                    title=input.plot_title_count(),
+                    yaxis_type=input.log_or_linear_count(),
+                    xaxis_title=input.x_label_count(),
+                    yaxis_title=input.y_label_count(),
+                )
+            table_dataframe_count.set(df_top_organisms)
+            save_table_to_csv(table_dataframe_count.get(), "count_data.csv")
+            return fig
+
+    @render.data_frame
+    @reactive.event(table_dataframe_count)
+    def table_count():
+        if table_dataframe_count.get().shape[0] != 0:
+            dataframe = table_dataframe_count.get()
+            dataframe['count'] = dataframe['count'].astype(int)
+            return render.DataGrid(dataframe, row_selection_mode="single", summary=True, )
+
+    @render.data_frame
+    @reactive.event(table_dataframe_percentage)
+    def table_percentage():
+        if table_dataframe_percentage.get().shape[0] != 0:
+            dataframe = table_dataframe_percentage.get()
+            dataframe['percentage'] = dataframe['percentage'].round()
+            return render.DataGrid(dataframe[['scientific_name', 'percentage']] , row_selection_mode="single", summary=True, )
+
+    @render.data_frame
+    @reactive.event(table_dataframe_occurence)
+    def table_occurence():
+        if table_dataframe_occurence.get().shape[0] != 0:
+            dataframe = table_dataframe_occurence.get()
+            # dataframe['percentage'] = dataframe['percentage'].astype(int)
+            return render.DataGrid(dataframe, row_selection_mode="single", summary=True, )
 
     @render_widget
     @reactive.event(input.x_axis_percentage, input.experiment_id_percentage, input.taxrank_percentage,
-                    input.count_percentage, input.color_percentage, input.top_selector_percentage,
-                    input.log_or_linear_percentage, input.data_scope_percentage, input.update_labeling_percentage)
+                    input.count_percentage,
+                    input.color_percentage, input.top_selector_percentage, input.log_or_linear_percentage,
+                    input.data_scope_percentage, input.update_labeling_percentage, input.figure_width_percentage,
+                    input.figure_height_percentage, input.log_trans_percentage)
     def plot_percentage():
         dataframe = df.get()
         dataframe = dataframe[(dataframe['experimentid'].isin(input.experiment_id_percentage.get())) &
                               (dataframe['taxrank'] == input.taxrank_percentage()) &
                               (dataframe['count'] > input.count_percentage())]
+
+        # Check if log normalization is selected and apply log transformation
+        if input.log_trans_percentage():
+            dataframe['count'] = np.log1p(dataframe['count'])
+
         if input.data_scope_percentage() == 'complete':
             total_counts = dataframe['count'].sum()
+            print(total_counts, dataframe['count'])
             df_total_counts = dataframe.groupby('scientific_name')['count'].sum().reset_index()
             df_total_counts['percentage'] = (df_total_counts['count'] / total_counts) * 100
         elif input.data_scope_percentage() == 'top_n':
             df_total_counts = dataframe.groupby('scientific_name')['count'].sum().reset_index()
-            df_top_organisms = df_total_counts.nlargest(input.top_selector_percentage(), columns='count')
+            df_top_organisms = df_total_counts.nlargest(input.top_selector_percentage(), 'count')
             top_total_counts = df_top_organisms['count'].sum()
             df_top_organisms['percentage'] = (df_top_organisms['count'] / top_total_counts) * 100
             df_total_counts = df_top_organisms
-        df_top_organisms = df_total_counts.nlargest(input.top_selector_percentage(), columns='percentage')
+
+        df_top_organisms = df_total_counts.nlargest(input.top_selector_percentage(), 'percentage')
         fig = px.histogram(
             data_frame=df_top_organisms,
             x=input.x_axis_percentage(),
             y='percentage',
             color=input.color_percentage(),
-            color_discrete_sequence=px.colors.qualitative.Plotly
+            color_discrete_sequence=px.colors.qualitative.Plotly,
+            width=input.figure_width_percentage(),
+            height=input.figure_height_percentage()
         ).update_layout(
             title=input.plot_title_percentage(),
             yaxis_type=input.log_or_linear_percentage(),
             xaxis_title=input.x_label_percentage(),
             yaxis_title=input.y_label_percentage()
         )
-
+        table_dataframe_percentage.set(df_top_organisms)
+        save_table_to_csv(table_dataframe_percentage.get()[['scientific_name', 'percentage']], "percentage_data.csv")
         return fig
 
     @render_widget
     @reactive.event(input.x_axis, input.y_axis, input.experiment_id_2, input.taxrank, input.count, input.color,
-                    input.top_selector, input.log_or_linear, input.mean_sum, input.data_scope,
-                    input.update_labeling_occurence)
+                    input.top_selector, input.log_or_linear, input.mean_sum, input.data_scope, input.update_labeling_occurence)
     def plot():
         print(input.top_selector())
         if input.x_axis() != None and input.y_axis() != None:
@@ -312,12 +427,13 @@ def test_view_server(
                 yaxis_title=input.y_label_occurence()
             )
             ).update_xaxes(tickangle=45)
+            table_dataframe_occurence.set(df_top_organisms)
 
             return fig
 
     @render_widget
     @reactive.event(input.experiment_id_occurence, input.taxrank_occurence, input.count_occurence,
-                    input.top_selector_occurence)
+                    input.top_selector_occurence, input.update_labeling_occurence, input.figure_width_occurence, input.figure_height_occurence)
     def test_plot():
         if len(input.experiment_id_occurence()) > 0 and df.get().shape[0] != 0:
             dataframe = df.get()
@@ -354,17 +470,18 @@ def test_view_server(
                 labels={'percentage': 'Gemiddeld Percentage van Totaal Aantal Barcodes',
                         'scientific_name': 'Organisme'},
                 color_discrete_sequence=px.colors.qualitative.Plotly,
-            )
-
-            fig2.update_layout(
-                xaxis_title="Gemiddeld Percentage van Totaal Aantal Barcodes",
-                yaxis_title="Organisme",
-                title=f"Gemiddeld Percentage Voorkomen van Top 20 Organismen over experimenten: {', '.join(input.experiment_id_occurence.get())}",
+                width=input.figure_width_occurence(),
+                height=input.figure_height_occurence()
+            ).update_layout(
+                title=input.plot_title_occurence(),
+                xaxis_title=input.x_label_occurence(),
+                yaxis_title=input.y_label_occurence(),
                 xaxis=dict(
                     range=[0, 100]
-                )
+                ),
             )
-
+            table_dataframe_occurence.set(top_10_combined)
+            save_table_to_csv(table_dataframe_occurence.get(), "occurence_data.csv")
             return fig2
 
     @render.data_frame
@@ -471,30 +588,6 @@ def culturomics_view_server(
             ui.update_select("culturomics_y_axis", choices=numeric_columns, selected=selection)
 
     @render_widget
-    @reactive.event(input.x_axis, input.y_axis, input.experiment_id_2, input.taxrank, input.count, input.color,
-                    input.top_selector)
-    def plot():
-        print(input.top_selector())
-        if input.x_axis() != None and input.y_axis() != None:
-            dataframe = df.get()
-            dataframe = dataframe[(dataframe['experimentid'] == input.experiment_id_2.get()[0]) & (
-                        dataframe['taxrank'] == input.taxrank()) & (dataframe['count'] > input.count())]
-            # dataframe = dataframe.nlargest(input.top_selector(), columns='count').reset_index(drop=True)
-            x_axis_selection = input.x_axis()
-            y_axis_selection = input.y_axis()
-            fig = (px.histogram(
-                data_frame=dataframe,
-                x=x_axis_selection,
-                y=y_axis_selection,
-                color=input.color(),
-            )
-                   .update_layout(
-                title="Test Plot",
-                yaxis_type='log'
-            ).update_xaxes(tickangle=45))
-            return fig
-
-    @render_widget
     @reactive.event(input.x_axis, input.y_axis, input.experiment_id_2, input.taxrank, input.count)
     def test_plot():
         if input.x_axis() != None and input.y_axis() != None and len(input.experiment_id_2()) > 0 and df.get().shape[
@@ -570,8 +663,8 @@ def test2_view_ui():
         ),
         ui.card(  # Add a new card
             ui.card_header("Edit Data"),
-            ui.input_select("column", "Column to Edit", choices=[]),
-            ui.input_text("new_value", "New Value"),
+            ui.input_select("table_selector", "Select Table", choices=[]),
+            ui.input_select("experiment_selector", "Select experiment", choices=[]),
             ui.input_action_button("update", "Update", class_="btn-success")
         )
 
@@ -580,9 +673,23 @@ def test2_view_ui():
 
 @module.server
 def test2_view_server(
-        input: Inputs, output: Outputs, session: Session, df: reactive.Value
+        input: Inputs, output: Outputs, session: Session, db_manager: Callable
 ):
     flag = reactive.value(0)
+    df = reactive.value(pd.DataFrame())
+    @reactive.effect
+    def df_table_aanmaken():
+        if input.table_selector() != None:
+            selected_table = input.table_selector()
+
+            try:
+                db_manager.execute(f"SELECT * FROM {selected_table}")
+                result = db_manager.fetch_all()
+                columns = db_manager.cursor.description
+                df.set(pd.DataFrame(result, columns=[column[0] for column in columns]))
+            except Exception as e:
+                # Handle database errors here (display an error message, etc.)
+                print(f"Error loading data: {e}")
 
     @render.text
     def row_count():
@@ -593,28 +700,24 @@ def test2_view_server(
         pass
 
     @reactive.effect
-    @reactive.event(input.update)
-    def updated_df():
-        dataframe = df.get()
-        selected_column = input.column()
-        new_value = input.new_value()
-        selected_rows = input.data_selected_rows()
-        temp_df = dataframe.copy()
-        for row_index in selected_rows:
-            dataframe.loc[row_index, selected_column] = new_value
-        flag.set(flag.get() + 1)
-        df.set(dataframe)
-        # df.assign(temp_df)
-        # Assuming you are allowing users to edit only one cell at a time:
+    def all_tables():
+        db_manager.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
+        result = db_manager.fetch_all()
+        tables = [table_name[0] for table_name in result]
+        ui.update_select("table_selector", choices=tables)
 
-        # selected_row_index = selected_rows[0]['row_index']
-        # df.get().loc[selected_row_index, selected_column] = new_value
-        #
-        # return df.get()  # Return the modified DataFrame
+    @reactive.effect
+    def experiment_selector():
+        if df.get().shape[0] != 0:
+            if "experimentid" in df.get().columns:
+                choices = df.get()['experimentid'].unique().tolist()
+                ui.update_select("experiment_selector", choices=choices)
 
     @render.data_frame
     def data():
         dataframe = df.get()
+        if input.experiment_selector():
+            dataframe = dataframe[dataframe['experimentid'] == input.experiment_selector()]
         return render.DataGrid(dataframe, row_selection_mode="multiple", filters=True, summary=True)
 
     @render.ui()
@@ -700,7 +803,7 @@ def dotplot_view_server(
 
     @render.text
     def second_selected_organism():
-        return f"First sample: {second_sample_name.get()}"
+        return f"Second sample: {second_sample_name.get()}"
 
     @reactive.effect
     @reactive.event(input.select)
