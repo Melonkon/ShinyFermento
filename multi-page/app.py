@@ -33,7 +33,7 @@ class DatabaseManager:
 # db_config = {
 #     "dbname": "test2",
 #     "user": "postgres",
-#     "password": "4321or1234",
+#     "password": "****",
 #     "host": "localhost",
 #     "port": "5433"
 # }
@@ -41,7 +41,7 @@ class DatabaseManager:
 db_config = {
     "dbname": "test5",
     "user": "ridderplaat.q",
-    "password": "Quinten4321or1234!",
+    "password": "****",
     "host": "145.97.18.149",
     "port": "5432"
 }

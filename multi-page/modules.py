@@ -272,20 +272,32 @@ def test_view_server(
                     xaxis_title=input.x_label_count(),
                     yaxis_title=input.y_label_count(),
                 )
-            elif input.combined_or_separate_count() == 'combined':
+            if input.combined_or_separate_count() == 'combined':
                 print("combined")
-                dataframe = dataframe[(dataframe['experimentid'].isin(input.experiment_id_count.get())) &
-                                      (dataframe['taxrank'] == input.taxrank_count()) &
-                                      (dataframe['count'] > input.count_count())]
+
+                # Filter the dataframe based on the input criteria
+                filtered_df = dataframe[
+                    (dataframe['experimentid'].isin(input.experiment_id_count.get())) &
+                    (dataframe['taxrank'] == input.taxrank_count()) &
+                    (dataframe['count'] > input.count_count())
+                    ]
 
                 aggregation_method = input.mean_sum_count()
 
-                # Conditionally apply log transformation
+                # Apply log transformation conditionally
                 if input.log_transform_count():
-                    dataframe['count'] = np.log1p(dataframe['count'])
+                    filtered_df['count'] = np.log1p(filtered_df['count'])
 
-                df_total_counts = dataframe.groupby('scientific_name')['count'].agg(aggregation_method).reset_index()
-                df_top_organisms = df_total_counts.nlargest(input.top_selector_count(), columns='count')
+                # Group by 'scientific_name' and aggregate based on the selected method
+                df_grouped = filtered_df.groupby('scientific_name').agg({
+                    'count': aggregation_method,
+                    **{col: 'first' for col in filtered_df.columns if col not in ['scientific_name', 'count']}
+                }).reset_index()
+
+                # Get the top N organisms based on the aggregated 'count'
+                df_top_organisms = df_grouped.nlargest(input.top_selector_count(), columns='count')
+
+                # Create the histogram using Plotly Express
                 fig = px.histogram(
                     data_frame=df_top_organisms,
                     x=input.x_axis_count(),
@@ -300,8 +312,11 @@ def test_view_server(
                     xaxis_title=input.x_label_count(),
                     yaxis_title=input.y_label_count(),
                 )
-            table_dataframe_count.set(df_top_organisms)
-            save_table_to_csv(table_dataframe_count.get(), "count_data.csv")
+
+                # Save the filtered and aggregated data to CSV
+                table_dataframe_count = df_top_organisms
+                table_dataframe_count.to_csv("count_data.csv", index=False)
+
             return fig
 
     @render.data_frame
