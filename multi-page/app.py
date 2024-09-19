@@ -39,9 +39,9 @@ class DatabaseManager:
 # }
 
 db_config = {
-    "dbname": "test5",
+    "dbname": "test6",
     "user": "ridderplaat.q",
-    "password": "****",
+    "password": "Quinten4321or1234!",
     "host": "145.97.18.149",
     "port": "5432"
 }
@@ -58,6 +58,7 @@ app_ui = ui.page_navbar(
 
 
 def server(input: Inputs, output: Outputs, session: Session):
+    print("Server started")
     db_manager = DatabaseManager(db_config)
     print("Connected to the database")
     dataframe = reactive.value(pd.DataFrame())
@@ -147,3 +148,6 @@ def server(input: Inputs, output: Outputs, session: Session):
 
 
 app = App(app_ui, server)
+
+if __name__ == "__main__":
+    app.run( reload=True)

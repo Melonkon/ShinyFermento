@@ -9,6 +9,11 @@ from shinywidgets import output_widget, render_widget
 import plotly.express as px
 import plotly.subplots as sp
 
+import os
+import shutil
+import subprocess
+import zipfile
+
 import requests
 from bs4 import BeautifulSoup
 import time
@@ -16,10 +21,11 @@ import random
 import string
 import asyncio
 import webbrowser
-import os
 import paramiko
 import stat
 import numpy as np
+from Bio import Entrez
+import subprocess
 
 
 @module.ui
@@ -757,9 +763,11 @@ def dotplot_view_ui():
                     ui.output_text_verbatim("first_selected_organism"),
                     ui.output_text_verbatim("second_selected_organism"),
                     ui.layout_columns(
+                        ui.input_action_button("send_reference", "Maak dotplot met referentie", class_="btn-success",
+                                               width="200px", height="40px"),
                         ui.input_action_button("send", "Maak dotplot", class_="btn-success", width="200px",
-                                               height="40px", ),
-                    ),
+                                                                   height="40px", ),
+                                        ),
                     ui.layout_columns(
                         ui.input_select("jobs", "Select job", choices=['None']),
                     ),
@@ -805,7 +813,7 @@ def dotplot_view_server(
     def generate_random_email():
         # Generates a random email
         name = ''.join(random.choice(string.ascii_letters) for _ in range(5))
-        domain = ''.join(random.choice(string.ascii_letters) for _ in range(5))
+        domain = 'gmail'
         return f"{name}@{domain}.com"
 
     @render.text
@@ -947,8 +955,14 @@ def dotplot_view_server(
 
             print(response.status_code, response.text)
 
-            os.remove(file_path_1)
-            os.remove(file_path_2)
+            if os.path.exists(file_path_1):
+                os.remove(file_path_1)
+            else:
+                print(f"File not found: {file_path_1}")
+            if os.path.exists(file_path_2):
+                os.remove(file_path_2)
+            else:
+                print(f"File not found: {file_path_2}")
 
             # Verstuur de laatste analyse-aanvraag
             data = {
@@ -1051,10 +1065,258 @@ def dotplot_view_server(
             url = base_url + "/result/" + input.jobs()
             webbrowser.open(url)
 
+    def search_reference_genome(organism_name: str):
+        Entrez.email = "qridderpl@gmail.com"
+        try:
+            search_handle = Entrez.esearch(db="nucleotide", term=f"{organism_name}[Organism] AND complete genome",
+                                           retmax=1, retmode="xml")
+            search_results = Entrez.read(search_handle)
+            search_handle.close()
+
+            if not search_results["IdList"]:
+                print(f"No reference genome found for {organism_name}.")
+                return None
+
+            ncbi_id = search_results["IdList"][0]
+
+            # You could further validate the returned NCBI ID by checking it against known taxon databases
+            if not validate_ncbi_id(ncbi_id):
+                print(f"Invalid NCBI ID: {ncbi_id}")
+                return None
+
+            return ncbi_id
+        except Exception as e:
+            print(f"Error searching for reference genome: {e}")
+            return None
+
+    def validate_ncbi_id(ncbi_id: str):
+        """Validate if the given NCBI ID is valid for genome downloads."""
+        try:
+            # Attempt to use the ID in the datasets tool to check if it's valid
+            command = ["datasets", "summary", "genome", "taxon", ncbi_id]
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
+
+            if "No genome found" in result.stdout:
+                return False
+            return True
+        except subprocess.CalledProcessError:
+            return False
+
+    def download_ncbi_reference_genome(ncbi_taxon_id: str, output_dir: str):
+        try:
+            # Ensure output directory exists
+            os.makedirs(output_dir, exist_ok=True)
+
+            # Path for the downloaded ZIP file
+            zip_file_path = os.path.join(output_dir, "ncbi_genome.zip")
+            fasta_file_path = os.path.join(output_dir, "reference_genome.fasta")
+
+            # Remove existing files to avoid permission issues
+            if os.path.exists(fasta_file_path):
+                os.remove(fasta_file_path)
+
+            # Command to download the genome
+            command = [
+                "datasets", "download", "genome", "taxon", ncbi_taxon_id,
+                "--assembly-level", "complete",  # Filter for high-quality assemblies
+                "--include", "genome",
+                "--filename", zip_file_path, "--reference", "--assembly-version", "latest"
+            ]
+
+            # Download the genome
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            print(result.stdout)
+
+            # Verify if the ZIP is corrupted (optional: you can check file size or hash)
+            if not zipfile.is_zipfile(zip_file_path):
+                print("The downloaded ZIP file is corrupted.")
+                os.remove(zip_file_path)  # Delete the corrupted file
+                return None
+
+            # Unzip the downloaded file
+            with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+                zip_ref.extractall(output_dir)
+
+            # Locate the genome files
+            extracted_dir = os.path.join(output_dir, "ncbi_dataset")
+            best_genome_file = None
+            for root, dirs, files in os.walk(extracted_dir):
+                for file in files:
+                    if file.endswith(".fna"):  # Look for the genome FASTA files
+                        best_genome_file = os.path.join(root, file)
+                        break
+
+            if not best_genome_file:
+                print(f"No suitable genome found in extracted data.")
+                return None
+
+            # Copy the best genome to the output location
+            shutil.copy(best_genome_file, fasta_file_path)
+            print(f"FASTA file extracted and saved at: {fasta_file_path}")
+
+            # Cleanup: remove the ZIP file and the extracted directory
+            os.remove(zip_file_path)
+            shutil.rmtree(extracted_dir)
+
+            return fasta_file_path
+
+        except subprocess.CalledProcessError as e:
+            print(f"Error downloading or extracting genome: {e}")
+            return None
+        except zipfile.BadZipFile as e:
+            print(f"Bad ZIP file: {e}")
+            return None
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            return None
+
+    @reactive.effect
+    @reactive.event(input.send_reference)
+    def request_dgenies_reference():
+        if first_sample_name.get() is not None and second_sample_name.get() is None:
+            try:
+                # Download the selected sample
+                ui.notification_show("Downloading selected sample", duration=None)
+                print("Starting sample download...")
+                bestanden_ophalen(first_sample_name.get())
+                print(f"Sample {first_sample_name.get()} download completed.")
+
+                # Get the organism name and tax_id from the selected sample
+                sample_row = df.get().loc[df.get()['csampleid'] == first_sample_name.get()]
+                organism_name = sample_row['wgs_organisme'].values[0]
+                tax_id = sample_row['wgs_taxid'].values[0] if 'wgs_taxid' in sample_row.columns else None
+
+                # Use the tax_id if it's available, otherwise fall back to Entrez search
+                if tax_id:
+                    # Cast the tax_id to an integer to remove the decimal point
+                    ncbi_id = str(int(tax_id))
+                    print(f"Using tax_id: {ncbi_id}")
+                else:
+                    ncbi_id = search_reference_genome(organism_name)
+                    if not ncbi_id:
+                        ui.notification_show(f"No reference genome found for {organism_name}", type="error")
+                        return
+                    print(f"Using Entrez NCBI ID: {ncbi_id}")
+
+                # Download the reference genome from NCBI
+                reference_genome = "reference_genome"
+                print(f"Downloading reference genome for tax_id {ncbi_id}...")
+                download_ncbi_reference_genome(ncbi_id, reference_genome)
+                reference_genome = os.path.join(reference_genome, "reference_genome.fasta")
+                print(f"Reference genome {reference_genome} download completed.")
+
+                new_id = generate_id()
+                email = generate_random_email()
+                print(f"Generated job ID: {new_id}, email: {email}")
+
+                # Create a session object
+                session = requests.Session()
+                main_url = "https://dgenies.toulouse.inra.fr/"
+
+                user_agents = [
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
+                    # Add other user-agents if needed
+                ]
+
+                session.headers.update({
+                    "accept": "*/*",
+                    "accept-language": "en-US,en;q=0.9",
+                    "user-agent": random.choice(user_agents),
+                    "x-requested-with": "XMLHttpRequest"
+                })
+
+                # Initial URL to get and extract s_id
+                initial_url = "https://dgenies.toulouse.inra.fr/run"
+                initial_response = session.get(initial_url)
+                soup = BeautifulSoup(initial_response.text, 'html.parser')
+                body_tag = soup.find('body', onload=True)
+                js_code = body_tag['onload']
+                s_id = js_code.split('dgenies.run.init')[1].strip()[1:-2].split(',')[0].strip("'")
+                print(f"s_id extracted: {s_id}")
+
+                # Send request to ask-upload
+                ask_upload_url = "https://dgenies.toulouse.inra.fr/ask-upload"
+                data = {"s_id": s_id}
+                ask_upload_response = session.post(ask_upload_url, data=data)
+                print(f"ask-upload response: {ask_upload_response.status_code}, {ask_upload_response.text}")
+
+                # Upload sample file
+                url = "https://dgenies.toulouse.inra.fr/upload"
+                file_path_1 = first_sample_name.get() + ".fasta"
+
+                print(f"Uploading sample: {file_path_1}")
+                with open(file_path_1, "rb") as f:
+                    files = {
+                        "s_id": (None, s_id),
+                        "formats": (None, "fasta"),
+                        "file-target": ("file1.fasta", f, "application/octet-stream")
+                    }
+                    response = session.post(url, files=files)
+                    print(f"Sample upload response: {response.status_code}, {response.text}")
+
+                # Upload reference genome
+                print(f"Uploading reference genome: {reference_genome}")
+                with open(reference_genome, "rb") as f:
+                    files = {
+                        "s_id": (None, s_id),
+                        "formats": (None, "fasta"),
+                        "file-target": ("reference.fasta", f, "application/octet-stream")
+                    }
+                    response = session.post(url, files=files)
+                    print(f"Reference genome upload response: {response.status_code}, {response.text}")
+
+                # Send the final analysis request for dotplot
+                data = {
+                    "id_job": new_id,
+                    "email": "qridderpl@gmail.com",
+                    "s_id": s_id,
+                    "type": "align",
+                    "jobs[0][id_job]": new_id,
+                    "jobs[0][email]": email,
+                    "jobs[0][s_id]": s_id,
+                    "jobs[0][query]": "file1.fasta",
+                    "jobs[0][query_type]": "local",
+                    "jobs[0][target]": "reference.fasta",  # Target reference genome
+                    "jobs[0][target_type]": "local",
+                    "jobs[0][tool]": "minimap2",
+                    "jobs[0][tool_options][]": "repeat:many",
+                    "nb_jobs": "1",
+                }
+                print(f"Sending final job request with data: {data}")
+                response = session.post("https://dgenies.toulouse.inra.fr/launch_analysis", data=data)
+
+                redirect_data = response.json()
+                redirect_url = redirect_data.get("redirect")
+                base_url = "https://dgenies.toulouse.inra.fr"
+                full_redirect_url = base_url + '/status/' + redirect_url.split("/")[-1]
+                print(f"Job launched, redirecting to: {full_redirect_url}")
+
+                # Monitor the job status
+                href = None
+                while href is None:
+                    response = session.get(full_redirect_url)
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    status = soup.find('div', class_='status-body')
+                    href = status.find('a', href=True)
+                    if "Your job  has failed" in status.text:
+                        print("Job has failed. Retrying or contacting support may be necessary.")
+                        break
+                    print(f"Checking job status: {full_redirect_url}")
+                    time.sleep(10)
+
+                print(base_url + href['href'])
+                webbrowser.open(base_url + href['href'])
+
+                # Reset values
+                first_sample_name.set(None)
+
+            except Exception as e:
+                ui.notification_show("Error during execution", type="error")
+                print(f"Error: {e}")
+
     def bestanden_ophalen(sample_id):
         HOSTNAME = "145.97.18.149"
         USERNAME = "ridderplaat.q"
-        # You'll likely need your SSH password here
         PASSWORD = "Quinten4321or1234!"
 
         remote_path = "/exports/nas/ridderplaat.q/Culturomics/results2122_v2/CLF2122_1032/assembly/assembly.fasta"
@@ -1076,6 +1338,7 @@ def dotplot_view_server(
             sub_folders = [item.filename for item in sub_items if stat.S_ISDIR(item.st_mode)]
             if sample_id in sub_folders:
                 remote_path = base_path + "/" + folder + "/" + sample_id + "/assembly/assembly.fasta"
+
                 break
         # Download the file
         sftp_client.get(remote_path, local_path)
@@ -1083,6 +1346,7 @@ def dotplot_view_server(
         # Close the connections
         sftp_client.close()
         ssh_client.close()
+        print(remote_path)
         print("Download complete!")
 
 
